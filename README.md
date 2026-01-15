@@ -24,3 +24,26 @@ These are all interesting problems, but they would distract from the core goal.
 
 The heart of the project will be how state changes are represented, stored, and propagated to other clients in a way that stays efficient as data grows.
 
+## Checkpoint 2: Figuring out what actually needs to be built
+
+Functional Requirements:
+
+- Creating and viewing multiple projects
+- Adding, updating, and deleting tasks within a project
+- Updating task fields like title, status, assignees, and configuration data
+- Basic task dependencies and simple status transition checks
+- Adding comments to tasks and viewing comment threads
+- Seeing task and comment updates from other clients in (near) real-time
+
+This means tasks and comments are the ones that would need real time updates, project level metadata will mostly be static
+
+Non-functional requirements:
+- Avoid resending full project payloads on every change
+- Keep updates small and incremental as project data grows
+- Maintain a consistent view of state across connected clients
+- Support multiple clients interacting with the same project at the same time
+- Keep API routes stateless and treat the database as the source of truth so the backend can scale beyond a single instance
+
+These will drive my design decisions.
+
+
