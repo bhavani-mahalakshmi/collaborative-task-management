@@ -107,3 +107,44 @@ Storing changes as events:
 Events are ordered using a project-level version.
 
 Each new event increments the version. Clients apply events in version order.
+
+
+## Checkpoint 5: Backend API and WebSocket flow
+
+### Flow of the app
+
+Clients don’t write events directly. They call backend APIs to send commands.
+
+The backend validates the command, applies the change, and records an event.
+
+Examples of commands:
+- Create or update a task
+- Add a comment
+
+API routes are stateless. The database is the source of truth.
+
+### WebSockets for real-time updates
+
+When a client opens a project, it connects to a WebSocket and subscribes to that project.
+
+Each project maps to a logical room. Clients connected to the same project join the same room.
+
+### Event flow
+
+When a command succeeds:
+- The backend writes a new event with the next project version
+- The event is broadcasted to all clients connected to that project
+
+Clients receive the event and apply it to their local state in version order.
+
+### Optimistic updates
+
+Clients update the UI optimistically when sending a command.
+
+If the server rejects a command or sends back a conflicting version, the client reconciles based on the events it receives.
+
+### Failure handling
+
+If a WebSocket connection drops, the client asks for events after its last known project version and applies them after reconnection.
+
+Any missed events should be fetched from the backend before applying new ones.
