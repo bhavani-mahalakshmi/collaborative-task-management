@@ -47,3 +47,29 @@ Non-functional requirements:
 These will drive my design decisions.
 
 
+## Checkpoint 3: Architecture and data flow
+
+### High level architecture
+The system is split into three main pieces:
+
+- A Next.js frontend that manages UI state and optimistic updates
+- API routes for commands like creating or updating tasks
+- A database that acts as the source of truth
+ 
+### Source of truth
+Clients don’t talk to each other directly. All changes flow through the backend.
+
+### Events
+- We dont need to send full project data around. We can do events. Each event represents a single action, like updating a task status or adding a comment.
+
+- These events are stored in the database and applied in order. Clients rebuild their local state by applying events rather than replacing entire objects.
+
+### How events are passed around between clients
+WebSockets are the obvious choice here. They support two-way communication, which makes it easy for clients to both send updates and receive changes
+
+### Ordering
+- The server will take care of validating commands and ordering events.
+
+- Clients may update the UI optimistically, but they still reconcile their state based on the events they receive from the server.
+
+
