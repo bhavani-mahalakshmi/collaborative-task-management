@@ -148,3 +148,29 @@ If the server rejects a command or sends back a conflicting version, the client 
 If a WebSocket connection drops, the client asks for events after its last known project version and applies them after reconnection.
 
 Any missed events should be fetched from the backend before applying new ones.
+
+
+## Checkpoint 6: Frontend state and real-time sync
+
+The frontend keeps local state for the current project and the last applied project version.
+
+User actions update the UI optimistically and send a command to the backend.
+
+When events arrive over the WebSocket, they are applied in version order to update local state.
+
+If the WebSocket disconnects, the client reconnects with the last known version and fetches any missed events before continuing.
+
+
+## Checkpoint 7: Tradeoffs and what I'd do next
+
+This design keeps things simple on purpose.
+
+The server decides the order of writes. That avoids pushing conflict handling to the client and keeps the sync model easier to follow.
+
+Events live next to the current-state tables instead of fully rebuilding state from events. This keeps reads simple while still recording every change.
+
+WebSockets are used only to deliver updates to connected clients. If a connection drops, the client reconnects and asks for any events it missed based on the last version it applied.
+
+Offline behavior is limited. The app assumes an active connection, and edits made while offline are not supported. This avoids adding another sync path on top of real-time updates.
+
+With more time, I’d look at supporting offline edits, using events for more reads, and handling conflicting updates in a more detailed way.
