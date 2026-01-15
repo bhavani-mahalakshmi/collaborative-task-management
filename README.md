@@ -73,3 +73,37 @@ WebSockets are the obvious choice here. They support two-way communication, whic
 - Clients may update the UI optimistically, but they still reconcile their state based on the events they receive from the server.
 
 
+## Checkpoint 4: Data model and event design
+
+### Core Entities (as mentioned)
+- Project
+- Task
+- Comment
+
+Tasks belong to a project. Comments belong to a task.
+
+These are stored in regular tables.
+
+### Events
+An event represents a single change, for example:
+- Task created
+- Task status updated
+- Comment added
+
+Each event has the following attached to it:
+- The project it belongs to
+- The type of change
+- The minimal data needed to apply that change
+- A timestamp/version
+
+Events are append-only. Once written, they are never updated or deleted.
+
+Storing changes as events:
+- Keeps updates small
+- Broadcasts only what changed
+- Applies changes in the right order
+
+### Versions
+Events are ordered using a project-level version.
+
+Each new event increments the version. Clients apply events in version order.
